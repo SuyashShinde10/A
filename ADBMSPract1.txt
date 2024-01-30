@@ -1,0 +1,121 @@
+CREATE TABLE sales (year number(4),product varchar2(10),amt number(10,2)) PARTITION BY RANGE (year)
+(PARTITION p1 VALUES LESS THAN (1990), PARTITION p2 VALUES LESS THAN (1993), PARTITION p3 VALUES LESS THAN (1996), PARTITION p4 VALUES LESS THAN (1999), PARTITION p5 VALUES LESS THAN (MAXVALUE));
+
+▷	To select data of table sales
+select * from sales;
+▷	To display the partition names using User_tab_partitions (data dictionary table)
+select PARTITION_NAME from USER_TAB_PARTITIONS where TABLE_NAME = 'SALES’;
+▷	To display the partition table details using user_part_tables (data dictionary  table)
+select	TABLE_NAME,	PARTITIONING_TYPE,	STATUS	from	USER_PART_TABLES	where TABLE_NAME = 'SALES';
+ 
+▷	To select data from a particular partition
+select * from sales partition(p1);
+
+
+
+CREATE TABLE customers(custcode number(5), cust_name varchar2(20),
+Address varchar2(10), City varchar2(20),
+Bal number(10)) partition by list(City)
+(partition north values ('DELHI','CHANDIGARH'), partition east values ('KOLKOTA','PATNA'),
+partition south values ('HYDERABAD','BANGALORE','CHENNAI'), partition west values ('BOMBAY','GOA'));
+
+
+▷	To select data of table customers
+○	select * from customers;
+▷	To select data from a particular partition
+○	select * from customers partition(east);
+▷	To display the partition names using User_tab_partitions (data dictionary table)
+○	select PARTITION_NAME from USER_TAB_PARTITIONS where TABLE_NAME = 'CUSTOMERS’;
+▷	To display the partition table details using user_part_tables (data dictionary table)
+○	SELECT	TABLE_NAME,	PARTITIONING_TYPE,	STATUS	FROM	USER_PART_TABLES	WHERE TABLE_NAME = 'CUSTOMERS';
+ 
+▷ From the perspective of the application, a partitioned table is identical to a nonpartitioned table; no modifications are necessary when accessing a partitioned table using SQL queries and DML statements.
+SELECT * FROM customers where City='BOMBAY';
+
+
+
+CREATE TABLE products (partno NUMBER, description VARCHAR2 (60))
+PARTITION BY HASH (partno)
+(PARTITION part1, PARTITION part2, PARTITION part3);
+ 
+▷	To select data of table products
+○	select * from products;
+▷	To select data from a particular partition
+○	select * from products partition(part1);
+▷	To display the partition names using User_tab_partitions (data dictionary table)
+○	select PARTITION_NAME from USER_TAB_PARTITIONS where TABLE_NAME = 'PRODUCTS';
+▷	To display the partition table details using user_part_tables (data dictionary table)
+○	SELECT	TABLE_NAME,	PARTITIONING_TYPE,	STATUS	FROM	USER_PART_TABLES	WHERE TABLE_NAME = 'PRODUCTS';
+
+
+
+
+○	For example, first create table price and partition it as follows
+CREATE TABLE PRICE (year number(4),product varchar2(10),amt number(10,2)) PARTITION BY RANGE (year)
+(PARTITION p1 VALUES LESS THAN (1990), PARTITION p2 VALUES LESS THAN (1995), PARTITION p3 VALUES LESS THAN (2000), PARTITION p4 VALUES LESS THAN (2005));
+○	Split partition p2 into two partitions p21,p22 at value 1993
+ALTER TABLE PRICE SPLIT PARTITION p2 AT (1993) INTO (PARTITION p21, PARTITION p22); select PARTITION_NAME from USER_TAB_PARTITIONS where TABLE_NAME = 'PRICE';
+ 
+ 
+ 
+▷	For example, the following query will split the west partition into 2 partitions ‘northwest’ and ‘southwest’
+ALTER TABLE customers SPLIT PARTITION west INTO (PARTITION northwest VALUES ('BOMBAY'), PARTITION southwest VALUES ('GOA'),
+PARTITION restofthewest);
+ 
+▷	Dropping Partitioned Tables
+○	To drop a partition from Range Partition table, List Partition or Composite Partition table give the following command.
+ALTER TABLE sales DROP PARTITION p5;
+○	You can also first delete all the records and then drop the partition like this
+DELETE FROM sales WHERE year=1994; ALTER TABLE sales DROP PARTITION p4;
+○	This method is most appropriate for small tables or for large tables when the partition being dropped contains a small percentage of the total data in the table.
+ 
+ 
+ 
+▷	Composite partitioning allows range partitions to be hash subpartitioned on a different key.
+ 
+ 
+CREATE TABLE invoices (invoice_no	NUMBER NOT NULL, invoice_date DATE	NOT NULL, comments	 VARCHAR2(100))
+PARTITION BY RANGE (invoice_date) SUBPARTITION BY HASH (invoice_no)
+SUBPARTITIONS 8
+(PARTITION invoices_q1 VALUES LESS THAN (TO_DATE('01/04/2001', 'DD/MM/YYYY')), PARTITION invoices_q2 VALUES LESS THAN (TO_DATE('01/07/2001', 'DD/MM/YYYY')), PARTITION invoices_q3 VALUES LESS THAN (TO_DATE('01/09/2001', 'DD/MM/YYYY')), PARTITION invoices_q4 VALUES LESS THAN (TO_DATE('01/01/2002', 'DD/MM/YYYY')));
+ 
+CREATE TABLE sales_composite (salesman_id NUMBER(5), salesman_name VARCHAR2(30), sales_amount NUMBER(10), sales_date	DATE)
+PARTITION BY RANGE(sales_date) SUBPARTITION BY HASH(salesman_id) SUBPARTITION TEMPLATE( SUBPARTITION sp1,
+SUBPARTITION sp2, SUBPARTITION sp3, SUBPARTITION sp4)
+Command continued on next slide
+ 
+(PARTITION sales_jan2000 VALUES LESS THAN(TO_DATE('02/01/2000','MM/DD/YYYY')), PARTITION sales_feb2000 VALUES LESS THAN(TO_DATE('03/01/2000','MM/DD/YYYY')), PARTITION sales_mar2000 VALUES LESS THAN(TO_DATE('04/01/2000','MM/DD/YYYY')), PARTITION sales_apr2000 VALUES LESS THAN(TO_DATE('05/01/2000','MM/DD/YYYY')), PARTITION sales_may2000 VALUES LESS THAN(TO_DATE('06/01/2000','MM/DD/YYYY')));
+ 
+
+
+ 
+ 
+
+ 
+CREATE TABLE bimonthly_regional_sales (deptno NUMBER,
+item_no VARCHAR2(20), txn_date DATE, txn_amount NUMBER, state VARCHAR2(2))
+PARTITION BY RANGE (txn_date) SUBPARTITION BY LIST (state) SUBPARTITION TEMPLATE(
+SUBPARTITION east VALUES('NY', 'VA', 'FL'), SUBPARTITION west VALUES('CA', 'OR', 'HI'), SUBPARTITION central VALUES('IL', 'TX', 'MO’))
+ 
+
+
+
+
+
+ 
+
+
+
+
+Command continued on next slide
+ 
+(
+PARTITION janfeb_2000 VALUES LESS THAN (TO_DATE('1-MAR-2000','DD-MON-YYYY')), PARTITION marapr_2000 VALUES LESS THAN (TO_DATE('1-MAY-2000','DD-MON-YYYY')), PARTITION mayjun_2000 VALUES LESS THAN (TO_DATE('1-JUL-2000','DD-MON-YYYY'))
+);
+
+SELECT PARTITION_NAME from USER_TAB_PARTITIONS where TABLE_NAME = 'BIMONTHLY_REGIONAL_SALES’;
+
+SELECT SUBPARTITION_NAME from USER_TAB_SUBPARTITIONS where TABLE_NAME = 'BIMONTHLY_REGIONAL_SALES';
+ 
+
+
