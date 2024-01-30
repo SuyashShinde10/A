@@ -1,0 +1,23 @@
+create table RollupTest(id int primary key, name varchar(50),
+gender varchar(20), salary int,
+department varchar(50));
+
+
+insert into RollupTest values(1,'moly','male',5000,'sales'); insert into RollupTest values(2,'jimmy','female',6000,'HR'); insert into RollupTest values(3,'katal','female',7500,'IT');
+insert into RollupTest values(4,'lenda','male',6500,'markating'); insert into RollupTest values(5,'shnana','female',5500,'finance'); insert into RollupTest values(6,'mike','male',8000,'sales');
+insert into RollupTest values(7,'tony','male',7200,'HR'); insert into RollupTest values(8,'lorry','female',6600,'IT');
+insert into RollupTest values(9,'kene','female',5400,'markating'); insert into RollupTest values(10,'hary','female',6300,'finance'); insert into RollupTest values(11,'potter','male',5700,'sales'); insert into RollupTest values(12,'zim kerry','male',7000,'HR'); insert into RollupTest values(13,'mikel','female',7100,'IT');
+insert into RollupTest values(14,'jakson','female',6800,'markating'); insert into RollupTest values(15,'warden','male',5000,'finance');
+
+
+
+
+
+create table employeeSales1 (
+empid int, dept int, product_id int,
+ 
+qty int, sales int,
+sales_year int
+
+);
+insert into employeeSales1 values(100,1,1,21,200,2000); insert into employeeSales1 values(101,1,1,21,150,2001); insert into employeeSales1 values(102,2,2,45,211,2002); insert into employeeSales1 values(103,3,2,21,2345,2003); insert into employeeSales1 values(100,1,3,45,322,2004); insert into employeeSales1 values(104,3,2,45,4000,2005); insert into employeeSales1 values(105,1,3,56,322,2006); insert into employeeSales1 values(106,2,2,32,322,2007); insert into employeeSales1 values(101,2,3,22,322,2008); insert into employeeSales1 values(103,3,3,44,3211,2009); insert into employeeSales1 values(104,3,2,66,4000,2010);
